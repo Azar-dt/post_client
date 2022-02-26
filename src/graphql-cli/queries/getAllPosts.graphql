@@ -1,0 +1,12 @@
+query GetAllPosts {
+  getAllPosts {
+    id
+    title
+    text
+    userId
+    textSnippet
+    user {
+      username
+    }
+  }
+}
