@@ -1,0 +1,9 @@
+query GetPostByID($getPostByIdId: Float!) {
+  getPostByID(id: $getPostByIdId) {
+    id
+    title
+    text
+    userId
+    createdAt
+  }
+}

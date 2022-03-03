@@ -70,7 +70,6 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreatePostArgs = {
   postInput: PostInput;
-  userId: Scalars['Float'];
 };
 
 
@@ -97,6 +96,14 @@ export type MutationRegisterArgs = {
 export type MutationUpdatePostArgs = {
   id: Scalars['ID'];
   postInput: PostInput;
+};
+
+export type PaginatedPosts = {
+  __typename?: 'PaginatedPosts';
+  cursor: Scalars['DateTime'];
+  hasmore: Scalars['Boolean'];
+  paginatedPosts: Array<Post>;
+  totalPosts: Scalars['Float'];
 };
 
 export type Post = {
@@ -127,16 +134,23 @@ export type PostMutationResponse = IMutationResponse & {
 
 export type Query = {
   __typename?: 'Query';
-  getAllPosts: Array<Post>;
+  getAllPosts?: Maybe<Array<Post>>;
   getAllUsers?: Maybe<Array<User>>;
   getPostByID?: Maybe<Post>;
   hello: Scalars['String'];
   me?: Maybe<User>;
+  posts?: Maybe<PaginatedPosts>;
 };
 
 
 export type QueryGetPostByIdArgs = {
   id: Scalars['Float'];
+};
+
+
+export type QueryPostsArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
 };
 
 export type RegisterInput = {
@@ -171,6 +185,13 @@ export type ChangePasswordMutationVariables = Exact<{
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserMutationResponse', code: number, success: boolean, message?: string | null | undefined, user?: { __typename?: 'User', id: string, email: string, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
+export type CreatePostMutationVariables = Exact<{
+  postInput: PostInput;
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostMutationResponse', code: number, success: boolean, message?: string | null | undefined, post?: { __typename?: 'Post', id: string, title: string, text: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, email: string, username: string } } | null | undefined } };
+
 export type ForgotPasswordMutationVariables = Exact<{
   forgotPasswordInput: ForgotPasswordInput;
 }>;
@@ -200,12 +221,27 @@ export type RegisterMutation = { __typename?: 'Mutation', register: { __typename
 export type GetAllPostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPostsQuery = { __typename?: 'Query', getAllPosts: Array<{ __typename?: 'Post', id: string, title: string, text: string, userId: number, textSnippet: string, user: { __typename?: 'User', username: string } }> };
+export type GetAllPostsQuery = { __typename?: 'Query', getAllPosts?: Array<{ __typename?: 'Post', id: string, title: string, text: string, userId: number, textSnippet: string, user: { __typename?: 'User', username: string } }> | null | undefined };
+
+export type GetPostByIdQueryVariables = Exact<{
+  getPostByIdId: Scalars['Float'];
+}>;
+
+
+export type GetPostByIdQuery = { __typename?: 'Query', getPostByID?: { __typename?: 'Post', id: string, title: string, text: string, userId: number, createdAt: any } | null | undefined };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, email: string, username: string } | null | undefined };
+
+export type PostsQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type PostsQuery = { __typename?: 'Query', posts?: { __typename?: 'PaginatedPosts', totalPosts: number, cursor: any, hasmore: boolean, paginatedPosts: Array<{ __typename?: 'Post', id: string, title: string, text: string, createdAt: any, userId: number, textSnippet: string, user: { __typename?: 'User', email: string, username: string, id: string } }> } | null | undefined };
 
 
 export const ChangePasswordDocument = gql`
@@ -252,6 +288,53 @@ export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptio
 export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const CreatePostDocument = gql`
+    mutation CreatePost($postInput: PostInput!) {
+  createPost(postInput: $postInput) {
+    code
+    success
+    message
+    post {
+      id
+      title
+      text
+      createdAt
+      updatedAt
+      user {
+        id
+        email
+        username
+      }
+    }
+  }
+}
+    `;
+export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
+
+/**
+ * __useCreatePostMutation__
+ *
+ * To run a mutation, you first call `useCreatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
+ *   variables: {
+ *      postInput: // value for 'postInput'
+ *   },
+ * });
+ */
+export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostMutation, CreatePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument, options);
+      }
+export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($forgotPasswordInput: ForgotPasswordInput!) {
   ForgotPassword(forgotPasswordInput: $forgotPasswordInput)
@@ -442,6 +525,45 @@ export function useGetAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetAllPostsQueryHookResult = ReturnType<typeof useGetAllPostsQuery>;
 export type GetAllPostsLazyQueryHookResult = ReturnType<typeof useGetAllPostsLazyQuery>;
 export type GetAllPostsQueryResult = Apollo.QueryResult<GetAllPostsQuery, GetAllPostsQueryVariables>;
+export const GetPostByIdDocument = gql`
+    query GetPostByID($getPostByIdId: Float!) {
+  getPostByID(id: $getPostByIdId) {
+    id
+    title
+    text
+    userId
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useGetPostByIdQuery__
+ *
+ * To run a query within a React component, call `useGetPostByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPostByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPostByIdQuery({
+ *   variables: {
+ *      getPostByIdId: // value for 'getPostByIdId'
+ *   },
+ * });
+ */
+export function useGetPostByIdQuery(baseOptions: Apollo.QueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPostByIdQuery, GetPostByIdQueryVariables>(GetPostByIdDocument, options);
+      }
+export function useGetPostByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPostByIdQuery, GetPostByIdQueryVariables>(GetPostByIdDocument, options);
+        }
+export type GetPostByIdQueryHookResult = ReturnType<typeof useGetPostByIdQuery>;
+export type GetPostByIdLazyQueryHookResult = ReturnType<typeof useGetPostByIdLazyQuery>;
+export type GetPostByIdQueryResult = Apollo.QueryResult<GetPostByIdQuery, GetPostByIdQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -478,3 +600,54 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const PostsDocument = gql`
+    query Posts($limit: Int!, $cursor: String) {
+  posts(limit: $limit, cursor: $cursor) {
+    totalPosts
+    cursor
+    hasmore
+    paginatedPosts {
+      id
+      title
+      text
+      createdAt
+      userId
+      user {
+        email
+        username
+        id
+      }
+      textSnippet
+    }
+  }
+}
+    `;
+
+/**
+ * __usePostsQuery__
+ *
+ * To run a query within a React component, call `usePostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePostsQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function usePostsQuery(baseOptions: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+      }
+export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostsQuery, PostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+        }
+export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
+export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
+export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;

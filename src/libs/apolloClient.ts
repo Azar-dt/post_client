@@ -5,9 +5,10 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
 } from "@apollo/client";
-import { concatPagination } from "@apollo/client/utilities";
 import merge from "deepmerge";
 import isEqual from "lodash/isEqual";
+import { Post } from "../generated/graphql";
+// import { Post } from "../generated/graphql";
 
 export const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 
@@ -24,7 +25,38 @@ function createApolloClient() {
       uri: "http://localhost:4000/graphql", // Server URL (must be absolute)
       credentials: "include", // Additional fetch() options like `credentials` or `headers`
     }),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            posts: {
+              keyArgs: false,
+              merge(existing, incoming) {
+                console.log("Run merge");
+
+                console.log("incoming", incoming, incoming.paginatedPosts);
+                console.log("existing", existing);
+
+                let paginatedPosts: Post[] = [];
+                if (existing) {
+                  paginatedPosts = paginatedPosts.concat(
+                    existing.paginatedPosts
+                  );
+                }
+                if (incoming) {
+                  paginatedPosts = paginatedPosts.concat(
+                    incoming.paginatedPosts
+                  );
+                }
+                console.log(paginatedPosts);
+
+                return { ...incoming, paginatedPosts };
+              },
+            },
+          },
+        },
+      },
+    }),
   });
 }
 
@@ -63,7 +95,7 @@ export function addApolloState(
   client: ApolloClient<NormalizedCacheObject>,
   pageProps: {
     props: IApolloClient;
-    revalidate: number;
+    revalidate?: number;
   }
 ) {
   if (pageProps?.props) {

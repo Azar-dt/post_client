@@ -6,6 +6,7 @@ import {
   useLogoutMutation,
   useMeQuery,
 } from "../generated/graphql";
+import Router from "next/router";
 
 interface NavbarProps {}
 
@@ -15,7 +16,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   // console.log(data, loading, error);
   let boxLog: any;
   const logoutHandler = async () => {
-    return await logout({
+    await logout({
       update(cache, { data }) {
         if (data.logout)
           cache.writeQuery({
@@ -24,6 +25,8 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           });
       },
     });
+    Router.push("/");
+    return logoutLoading;
   };
   if (loading) {
     boxLog = null;
@@ -41,6 +44,12 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   } else {
     boxLog = (
       <Box>
+        <Button mr={"8px"}>
+          <NextLink href={"/create-post"}>
+            <Link>Create Post</Link>
+          </NextLink>
+        </Button>
+
         <Button onClick={logoutHandler} isLoading={logoutLoading}>
           Logout
         </Button>
@@ -56,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         maxW="800px"
       >
         <NextLink href={"/"}>
-          <Heading>Nextjs</Heading>
+          <Heading cursor={"pointer"}>Nextjs</Heading>
         </NextLink>
         {boxLog}
       </Flex>
