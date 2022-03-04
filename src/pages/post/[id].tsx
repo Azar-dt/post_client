@@ -11,10 +11,19 @@ import {
 import { useRouter } from "next/router";
 import React from "react";
 import { Wrapper } from "../../components/Wrapper";
-import { useGetPostByIdQuery, useMeQuery } from "../../generated/graphql";
+import {
+  GetPostByIdDocument,
+  GetPostByIdQuery,
+  PaginatedPostsIdDocument,
+  PaginatedPostsIdQuery,
+  useGetPostByIdQuery,
+  useMeQuery,
+  usePaginatedPostsIdQuery,
+} from "../../generated/graphql";
 import NextLink from "next/link";
 import PostDeleteEditButton from "../../components/PostDeleteEditButton";
-import { initializeApollo } from "../../libs/apolloClient";
+import { addApolloState, initializeApollo } from "../../libs/apolloClient";
+import { GetStaticPaths, GetStaticProps } from "next";
 
 interface PostProps {}
 
@@ -67,6 +76,37 @@ const Post: React.FC<PostProps> = ({}) => {
       </Box>
     </Wrapper>
   );
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const apolloClient = initializeApollo();
+  const { data } = await apolloClient.query<PaginatedPostsIdQuery>({
+    query: PaginatedPostsIdDocument,
+    variables: { limit: 3 },
+  });
+
+  return {
+    paths: data.posts!.paginatedPosts.map((post) => ({
+      params: { id: `${post.id}` },
+    })),
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps<
+  { [key: string]: any },
+  { id: string }
+> = async ({ params }) => {
+  const apolloClient = initializeApollo();
+  await apolloClient.query<GetPostByIdQuery>({
+    query: GetPostByIdDocument,
+    variables: {
+      getPostByIdId: Number(params.id),
+    },
+  });
+  return addApolloState(apolloClient, {
+    props: {},
+  });
 };
 
 export default Post;

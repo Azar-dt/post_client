@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Link, Spinner, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Link,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import NextLink from "next/link";
 import Router from "next/router";
@@ -12,6 +20,7 @@ import { useCheckAuth } from "../utils/useCheckAuth";
 interface loginProps {}
 
 const login: React.FC<loginProps> = ({}) => {
+  const toast = useToast();
   const [login, { error, loading }] = useLoginMutation();
   const { data: authData, loading: authLoading } = useCheckAuth();
 
@@ -34,6 +43,14 @@ const login: React.FC<loginProps> = ({}) => {
     if (response.data?.login.errors) {
       setErrors(mapError(response.data.login.errors));
     } else if (response.data.login.user) {
+      toast({
+        title: "Welcome",
+        description: `${response.data.login.user.username}`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
       Router.push("/");
     }
     return loading;

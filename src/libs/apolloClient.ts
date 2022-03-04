@@ -32,10 +32,10 @@ function createApolloClient() {
             posts: {
               keyArgs: false,
               merge(existing, incoming) {
-                console.log("Run merge");
+                // console.log("Run merge");
 
-                console.log("incoming", incoming, incoming.paginatedPosts);
-                console.log("existing", existing);
+                // console.log("incoming", incoming, incoming.paginatedPosts);
+                // console.log("existing", existing);
 
                 let paginatedPosts: Post[] = [];
                 if (existing) {
@@ -48,7 +48,7 @@ function createApolloClient() {
                     incoming.paginatedPosts
                   );
                 }
-                console.log(paginatedPosts);
+                // console.log(paginatedPosts);
 
                 return { ...incoming, paginatedPosts };
               },

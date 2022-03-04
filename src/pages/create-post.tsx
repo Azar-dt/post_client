@@ -43,7 +43,7 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
   } else
     return (
       <Wrapper>
-        <Box w={400} mx={"auto"} mt={10}>
+        <Box w={800} mx={"auto"} mt={10}>
           <Formik
             initialValues={{
               title: "",
@@ -66,6 +66,7 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
                     placeholder="Text"
                     label="text"
                     type="text"
+                    textarea
                   />
                 </Box>
                 <Box>

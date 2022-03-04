@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, Spinner } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Spinner, useToast } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import Router from "next/router";
 import React from "react";
@@ -11,6 +11,7 @@ import { useCheckAuth } from "../utils/useCheckAuth";
 interface registerProps {}
 
 const register: React.FC<registerProps> = ({}) => {
+  const toast = useToast();
   const [register, { error, loading }] = useRegisterMutation();
   const { data: authData, loading: authLoading } = useCheckAuth();
 
@@ -46,6 +47,13 @@ const register: React.FC<registerProps> = ({}) => {
               if (response.data?.register.errors) {
                 setErrors(mapError(response.data.register.errors));
               } else if (response.data.register.user) {
+                toast({
+                  title: "Welcome",
+                  description: `${response.data.register.user.username}`,
+                  status: "success",
+                  duration: 3000,
+                  isClosable: true,
+                });
                 Router.push("/");
               }
               return loading;
