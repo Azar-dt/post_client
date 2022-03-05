@@ -69,16 +69,18 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
                     textarea
                   />
                 </Box>
-                <Box>
+                <Flex mt={"16px"} justifyContent={"space-between"}>
                   <Button
                     type="submit"
                     colorScheme="teal"
                     isLoading={isSubmitting}
-                    mt={"16px"}
                   >
                     Create post
                   </Button>
-                </Box>
+                  <NextLink href="/">
+                    <Button>Back to Homepage</Button>
+                  </NextLink>
+                </Flex>
               </Form>
             )}
           </Formik>

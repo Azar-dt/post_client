@@ -20,7 +20,7 @@ import {
 } from "../generated/graphql";
 import { addApolloState, initializeApollo } from "../libs/apolloClient";
 
-const limit = 3;
+export const limit = 5;
 
 const Index = () => {
   const { data: meData, loading: meLoading } = useMeQuery();

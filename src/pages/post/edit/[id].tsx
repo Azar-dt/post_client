@@ -14,6 +14,7 @@ import { Wrapper } from "../../../components/Wrapper";
 import {
   GetPostByIdDocument,
   PostInput,
+  PostsDocument,
   UpdatePostMutationVariables,
   useGetPostByIdQuery,
   useMeQuery,
@@ -23,7 +24,7 @@ import NextLink from "next/link";
 import { Form, Formik } from "formik";
 import { InputField } from "../../../components/InputField";
 import { mapError } from "../../../helper/mapError";
-
+import { limit } from "../../index";
 interface EditPostProps {}
 
 const EditPost: React.FC<EditPostProps> = ({}) => {
@@ -39,7 +40,20 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
   const { data: meData, loading: meLoading } = useMeQuery();
   const [updatePost, { data: updateData, loading: updateLoading }] =
     useUpdatePostMutation({
-      refetchQueries: [GetPostByIdDocument],
+      refetchQueries: [
+        {
+          query: GetPostByIdDocument,
+          variables: {
+            getPostByIdId: Number(id),
+          },
+        },
+        {
+          query: PostsDocument,
+          variables: {
+            limit,
+          },
+        },
+      ],
     });
   const toast = useToast();
   const onSubmitHandler = async (values: PostInput, { setErrors }) => {
@@ -120,16 +134,17 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
                   textarea
                 />
               </Box>
-              <Box>
+              <Flex mt={"16px"} justifyContent={"space-between"}>
                 <Button
                   type="submit"
                   colorScheme="teal"
                   isLoading={isSubmitting}
-                  mt={"16px"}
                 >
                   Update post
                 </Button>
-              </Box>
+
+                <Button onClick={() => router.back()}>Back</Button>
+              </Flex>
             </Form>
           )}
         </Formik>

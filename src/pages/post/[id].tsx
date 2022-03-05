@@ -33,7 +33,7 @@ const Post: React.FC<PostProps> = ({}) => {
   const { data, loading, error } = useGetPostByIdQuery({
     variables: { getPostByIdId: Number(id) },
   });
-  const { data: meData, loading: meLoading } = useMeQuery();
+
   if (loading)
     return (
       <Wrapper>
@@ -63,15 +63,13 @@ const Post: React.FC<PostProps> = ({}) => {
         <Heading mb={4}>{data?.getPostByID.title}</Heading>
         <Box mb={4}>{data?.getPostByID.text}</Box>
         <Flex justifyContent="space-between" alignItems="center">
-          {meData?.me?.id === data?.getPostByID.userId.toString() && (
-            <PostDeleteEditButton
-              postId={data?.getPostByID.id}
-              postUserId={data?.getPostByID.userId.toString()}
-            />
-          )}
           <NextLink href="/">
             <Button>Back to Homepage</Button>
           </NextLink>
+          <PostDeleteEditButton
+            postId={data?.getPostByID.id}
+            postUserId={data?.getPostByID.userId.toString()}
+          />
         </Flex>
       </Box>
     </Wrapper>
