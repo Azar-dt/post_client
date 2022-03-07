@@ -8,7 +8,8 @@ import {
 import merge from "deepmerge";
 import isEqual from "lodash/isEqual";
 import { Post } from "../generated/graphql";
-// import { Post } from "../generated/graphql";
+import { IncomingHttpHeaders } from "http";
+import fetch from "isomorphic-unfetch";
 
 export const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 
@@ -18,12 +19,25 @@ interface IApolloClient {
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
-function createApolloClient() {
+function createApolloClient(headers: IncomingHttpHeaders | null = null) {
+  const enhancedFetch = (url: RequestInfo, init: RequestInit) => {
+    return fetch(url, {
+      ...init,
+      headers: {
+        ...init.headers,
+        "Access-Control-Allow-Origin": "*",
+        // here we pass the cookie along for each request
+        Cookie: headers?.cookie ?? "",
+      },
+    });
+  };
+
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
     link: new HttpLink({
       uri: "http://localhost:4000/graphql", // Server URL (must be absolute)
       credentials: "include", // Additional fetch() options like `credentials` or `headers`
+      fetch: enhancedFetch,
     }),
     cache: new InMemoryCache({
       typePolicies: {
@@ -32,25 +46,23 @@ function createApolloClient() {
             posts: {
               keyArgs: false,
               merge(existing, incoming) {
-                // console.log("Run merge");
-
-                // console.log("incoming", incoming, incoming.paginatedPosts);
                 // console.log("existing", existing);
-
+                // console.log("incoming", incoming);
                 let paginatedPosts: Post[] = [];
-                if (existing) {
+                if (existing && existing.paginatedPosts) {
                   paginatedPosts = paginatedPosts.concat(
                     existing.paginatedPosts
                   );
                 }
-                if (incoming) {
+                if (incoming && incoming.paginatedPosts) {
                   paginatedPosts = paginatedPosts.concat(
                     incoming.paginatedPosts
                   );
                 }
-                // console.log(paginatedPosts);
-
-                return { ...incoming, paginatedPosts };
+                return {
+                  ...incoming,
+                  paginatedPosts,
+                };
               },
             },
           },
@@ -60,8 +72,16 @@ function createApolloClient() {
   });
 }
 
-export function initializeApollo(initialState = null) {
-  const _apolloClient = apolloClient ?? createApolloClient();
+export function initializeApollo(
+  {
+    headers,
+    initialState,
+  }: {
+    headers?: IncomingHttpHeaders | null;
+    initialState?: NormalizedCacheObject | null;
+  } = { headers: null, initialState: null }
+) {
+  const _apolloClient = apolloClient ?? createApolloClient(headers);
 
   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
   // gets hydrated here
@@ -107,6 +127,9 @@ export function addApolloState(
 
 export function useApollo(pageProps: IApolloClient) {
   const state = pageProps[APOLLO_STATE_PROP_NAME];
-  const store = useMemo(() => initializeApollo(state), [state]);
+  const store = useMemo(
+    () => initializeApollo({ initialState: state }),
+    [state]
+  );
   return store;
 }

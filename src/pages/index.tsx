@@ -9,51 +9,27 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import NextLink from "next/link";
 import PostDeleteEditButton from "../components/PostDeleteEditButton";
+import VoteSection from "../components/VoteSection";
 import { Wrapper } from "../components/Wrapper";
-import {
-  Post,
-  PostsDocument,
-  useMeQuery,
-  usePostsQuery,
-} from "../generated/graphql";
+import { PostsDocument, usePostsQuery } from "../generated/graphql";
 import { addApolloState, initializeApollo } from "../libs/apolloClient";
 
-export const limit = 5;
+export const limit = 3;
 
 const Index = () => {
-  const { data: meData, loading: meLoading } = useMeQuery();
-  const { data, loading, fetchMore, networkStatus, refetch } = usePostsQuery({
+  const { data, loading, fetchMore, networkStatus } = usePostsQuery({
     variables: {
       limit,
     },
-    notifyOnNetworkStatusChange: true, // component render boi query nay se rerender khi networkstatus change
+    notifyOnNetworkStatusChange: false, // component render boi query nay se rerender khi networkstatus change
   });
   const isLoadingMorePosts = networkStatus === NetworkStatus.fetchMore;
 
-  const loadMorePosts = () => {
-    // fetchMore({
-    //   variables: { cursor: data?.posts?.cursor },
-    //   updateQuery(existing: any, incoming: any) {
-    //     console.log("existing", existing.paginatedPosts);
-    //     console.log("incoming", incoming.fetchMoreResult.paginatedPosts);
-    //     let paginatedPosts: any[] = [];
-    //     if (existing && existing.paginatedPosts) {
-    //       paginatedPosts = paginatedPosts.concat(existing.paginatedPosts);
-    //     }
-    //     if (incoming) {
-    //       paginatedPosts = paginatedPosts.concat(
-    //         incoming.fetchMoreResult.paginatedPosts
-    //       );
-    //     }
-    //     console.log(paginatedPosts);
-
-    //     return { ...incoming.fetchMoreResult, paginatedPosts };
-    //   },
-    // });
-    refetch({ limit: 3, cursor: data?.posts?.cursor });
-  };
+  const loadMorePosts = () =>
+    fetchMore({ variables: { cursor: data?.posts?.cursor } });
   return (
     <Wrapper>
       {loading && !isLoadingMorePosts ? (
@@ -81,6 +57,7 @@ const Index = () => {
                 // mx="auto"
                 mt="4px"
               >
+                <VoteSection post={post} />
                 <Box flex={1}>
                   <NextLink href={`/post/${post.id}`}>
                     <Link>
@@ -91,12 +68,10 @@ const Index = () => {
                   <Flex alignItems={"center"}>
                     <Text mt="4">{post.textSnippet}...</Text>
                     <Box ml={"auto"}>
-                      {meData?.me?.id === post.userId.toString() && (
-                        <PostDeleteEditButton
-                          postId={post.id}
-                          postUserId={post.userId.toString()}
-                        />
-                      )}
+                      <PostDeleteEditButton
+                        postId={post.id}
+                        postUserId={post.userId.toString()}
+                      />
                     </Box>
                   </Flex>
                 </Box>
@@ -108,7 +83,7 @@ const Index = () => {
       {data?.posts?.hasmore && (
         <Flex mt={"20px"} justifyContent={"center"}>
           <Button isLoading={isLoadingMorePosts} onClick={loadMorePosts}>
-            Next
+            Load more
           </Button>
         </Flex>
       )}
@@ -116,8 +91,10 @@ const Index = () => {
   );
 };
 
-export async function getStaticProps() {
-  const apolloClient = initializeApollo();
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const apolloClient = initializeApollo({ headers: context.req.headers });
 
   await apolloClient.query({
     query: PostsDocument,
@@ -129,6 +106,6 @@ export async function getStaticProps() {
   return addApolloState(apolloClient, {
     props: {},
   });
-}
+};
 
 export default Index;

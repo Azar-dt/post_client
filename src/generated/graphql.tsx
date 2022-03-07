@@ -55,6 +55,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   register: UserMutationResponse;
   updatePost: PostMutationResponse;
+  vote: PostMutationResponse;
 };
 
 
@@ -98,6 +99,12 @@ export type MutationUpdatePostArgs = {
   postInput: PostInput;
 };
 
+
+export type MutationVoteArgs = {
+  inputVoteValue: VoteType;
+  postId: Scalars['Int'];
+};
+
 export type PaginatedPosts = {
   __typename?: 'PaginatedPosts';
   cursor: Scalars['DateTime'];
@@ -109,7 +116,9 @@ export type PaginatedPosts = {
 export type Post = {
   __typename?: 'Post';
   createdAt: Scalars['DateTime'];
+  currentUserVoteType: Scalars['Float'];
   id: Scalars['ID'];
+  points: Scalars['Float'];
   text: Scalars['String'];
   textSnippet: Scalars['String'];
   title: Scalars['String'];
@@ -178,6 +187,13 @@ export type UserMutationResponse = IMutationResponse & {
   user?: Maybe<User>;
 };
 
+export enum VoteType {
+  DownVote = 'DownVote',
+  UpVote = 'UpVote'
+}
+
+export type PostWithUserInforFragment = { __typename?: 'Post', id: string, title: string, text: string, textSnippet: string, userId: number, points: number, currentUserVoteType: number, createdAt: any, user: { __typename?: 'User', email: string, username: string, id: string } };
+
 export type ChangePasswordMutationVariables = Exact<{
   changePasswordData: ChangePasswordData;
 }>;
@@ -233,6 +249,14 @@ export type UpdatePostMutationVariables = Exact<{
 
 export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: { __typename?: 'PostMutationResponse', code: number, success: boolean, message?: string | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
+export type VoteMutationVariables = Exact<{
+  inputVoteValue: VoteType;
+  postId: Scalars['Int'];
+}>;
+
+
+export type VoteMutation = { __typename?: 'Mutation', vote: { __typename?: 'PostMutationResponse', code: number, success: boolean, message?: string | null | undefined, post?: { __typename?: 'Post', id: string, title: string, text: string, textSnippet: string, userId: number, points: number, currentUserVoteType: number, createdAt: any, user: { __typename?: 'User', email: string, username: string, id: string } } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+
 export type GetAllPostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -264,9 +288,25 @@ export type PostsQueryVariables = Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts?: { __typename?: 'PaginatedPosts', totalPosts: number, cursor: any, hasmore: boolean, paginatedPosts: Array<{ __typename?: 'Post', id: string, title: string, text: string, createdAt: any, userId: number, textSnippet: string, user: { __typename?: 'User', email: string, username: string, id: string } }> } | null | undefined };
+export type PostsQuery = { __typename?: 'Query', posts?: { __typename?: 'PaginatedPosts', totalPosts: number, cursor: any, hasmore: boolean, paginatedPosts: Array<{ __typename?: 'Post', id: string, title: string, text: string, textSnippet: string, userId: number, points: number, currentUserVoteType: number, createdAt: any, user: { __typename?: 'User', email: string, username: string, id: string } }> } | null | undefined };
 
-
+export const PostWithUserInforFragmentDoc = gql`
+    fragment postWithUserInfor on Post {
+  id
+  title
+  text
+  textSnippet
+  userId
+  points
+  currentUserVoteType
+  createdAt
+  user {
+    email
+    username
+    id
+  }
+}
+    `;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($changePasswordData: ChangePasswordData!) {
   changePassword(changePasswordData: $changePasswordData) {
@@ -586,6 +626,49 @@ export function useUpdatePostMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdatePostMutationHookResult = ReturnType<typeof useUpdatePostMutation>;
 export type UpdatePostMutationResult = Apollo.MutationResult<UpdatePostMutation>;
 export type UpdatePostMutationOptions = Apollo.BaseMutationOptions<UpdatePostMutation, UpdatePostMutationVariables>;
+export const VoteDocument = gql`
+    mutation Vote($inputVoteValue: VoteType!, $postId: Int!) {
+  vote(inputVoteValue: $inputVoteValue, postId: $postId) {
+    code
+    success
+    message
+    post {
+      ...postWithUserInfor
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    ${PostWithUserInforFragmentDoc}`;
+export type VoteMutationFn = Apollo.MutationFunction<VoteMutation, VoteMutationVariables>;
+
+/**
+ * __useVoteMutation__
+ *
+ * To run a mutation, you first call `useVoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [voteMutation, { data, loading, error }] = useVoteMutation({
+ *   variables: {
+ *      inputVoteValue: // value for 'inputVoteValue'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useVoteMutation(baseOptions?: Apollo.MutationHookOptions<VoteMutation, VoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument, options);
+      }
+export type VoteMutationHookResult = ReturnType<typeof useVoteMutation>;
+export type VoteMutationResult = Apollo.MutationResult<VoteMutation>;
+export type VoteMutationOptions = Apollo.BaseMutationOptions<VoteMutation, VoteMutationVariables>;
 export const GetAllPostsDocument = gql`
     query GetAllPosts {
   getAllPosts {
@@ -747,21 +830,11 @@ export const PostsDocument = gql`
     cursor
     hasmore
     paginatedPosts {
-      id
-      title
-      text
-      createdAt
-      userId
-      user {
-        email
-        username
-        id
-      }
-      textSnippet
+      ...postWithUserInfor
     }
   }
 }
-    `;
+    ${PostWithUserInforFragmentDoc}`;
 
 /**
  * __usePostsQuery__

@@ -4,17 +4,7 @@ query Posts($limit: Int!, $cursor: String) {
     cursor
     hasmore
     paginatedPosts {
-      id
-      title
-      text
-      createdAt
-      userId
-      user {
-        email
-        username
-        id
-      }
-      textSnippet
+      ...postWithUserInfor
     }
   }
 }

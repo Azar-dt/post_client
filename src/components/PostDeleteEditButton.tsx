@@ -13,6 +13,7 @@ import {
   ModalOverlay,
   Text,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -34,6 +35,7 @@ const PostDeleteEditButton: React.FC<PostDeleteEditButtonProps> = ({
   postUserId,
 }) => {
   const router = useRouter();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: meData } = useMeQuery();
   const [deletePost, _] = useDeletePostMutation();
@@ -61,18 +63,16 @@ const PostDeleteEditButton: React.FC<PostDeleteEditButtonProps> = ({
           },
         });
       },
-      // refetchQueries: [
-      //   {
-      //     query: PostsDocument,
-      //     variables: {
-      //       limit: 3,
-      //     },
-      //   },
-      // ],
     });
     if (response.data.deletePost.success) {
-      // onClose();
-      router.push("/");
+      onClose();
+      toast({
+        title: "",
+        description: "Delete post successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
   if (meData?.me?.id !== postUserId) return <Box />;

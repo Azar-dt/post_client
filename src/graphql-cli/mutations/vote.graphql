@@ -1,0 +1,14 @@
+mutation Vote($inputVoteValue: VoteType!, $postId: Int!) {
+  vote(inputVoteValue: $inputVoteValue, postId: $postId) {
+    code
+    success
+    message
+    post {
+      ...postWithUserInfor
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

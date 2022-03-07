@@ -7,6 +7,7 @@ import {
   useMeQuery,
 } from "../generated/graphql";
 import Router from "next/router";
+import { gql, Reference } from "@apollo/client";
 
 interface NavbarProps {}
 
@@ -18,11 +19,31 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   const logoutHandler = async () => {
     await logout({
       update(cache, { data }) {
-        if (data.logout)
+        if (data.logout) {
           cache.writeQuery({
             query: MeDocument,
             data: { me: null },
           });
+          cache.modify({
+            fields: {
+              posts(existing) {
+                existing.paginatedPosts.forEach((post: Reference) => {
+                  cache.writeFragment({
+                    id: post.__ref,
+                    fragment: gql`
+                      fragment currentUserVoteType on Post {
+                        currentUserVoteType
+                      }
+                    `,
+                    data: {
+                      currentUserVoteType: 0,
+                    },
+                  });
+                });
+              },
+            },
+          });
+        }
       },
     });
     Router.push("/");

@@ -10,16 +10,10 @@ import {
 } from "@apollo/client";
 import { useApollo } from "../libs/apolloClient";
 
-const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
-  cache: new InMemoryCache(),
-  credentials: "include",
-});
-
 function MyApp({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps);
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={apolloClient}>
       <ChakraProvider resetCSS theme={theme}>
         <Component {...pageProps} />
       </ChakraProvider>
