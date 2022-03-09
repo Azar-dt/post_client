@@ -1,6 +1,5 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { Flex, IconButton } from "@chakra-ui/react";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import {
   PostWithUserInforFragment,
@@ -19,7 +18,6 @@ interface VoteSectionProps {
 
 const VoteSection: React.FC<VoteSectionProps> = ({ post }) => {
   const [vote, { loading }] = useVoteMutation();
-  const router = useRouter();
   const [loadingState, setLoadingState] = useState<
     "upvote-loading" | "downvote-loading" | "not-loading"
   >("not-loading");
