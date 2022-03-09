@@ -1,12 +1,10 @@
 import {
   Alert,
-  AlertDescription,
   AlertIcon,
   AlertTitle,
   Box,
   Button,
   Flex,
-  Link,
   Text,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
@@ -17,7 +15,6 @@ import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import { useChangePasswordMutation } from "../generated/graphql";
 import { mapError } from "../helper/mapError";
-import { useCheckAuth } from "../utils/useCheckAuth";
 
 interface ChangePasswordProps {}
 

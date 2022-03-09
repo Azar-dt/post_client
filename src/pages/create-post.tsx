@@ -1,12 +1,12 @@
-import { Box, Button, Flex, Link, Spinner } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { Box, Button, Flex, Spinner } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
+import NextLink from "next/link";
+import Router from "next/router";
 import React from "react";
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
-import { useCheckAuth } from "../utils/useCheckAuth";
 import { useCreatePostMutation } from "../generated/graphql";
-import Router from "next/router";
+import { useCheckAuth } from "../utils/useCheckAuth";
 interface CreatePostProps {}
 
 const CreatePost: React.FC<CreatePostProps> = ({}) => {

@@ -12,7 +12,7 @@ interface registerProps {}
 
 const register: React.FC<registerProps> = ({}) => {
   const toast = useToast();
-  const [register, { error, loading }] = useRegisterMutation();
+  const [register, { loading }] = useRegisterMutation();
   const { data: authData, loading: authLoading } = useCheckAuth();
 
   const body =

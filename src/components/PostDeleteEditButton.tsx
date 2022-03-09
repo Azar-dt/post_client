@@ -16,11 +16,9 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
 import {
   PaginatedPosts,
-  PostsDocument,
   useDeletePostMutation,
   useMeQuery,
 } from "../generated/graphql";
@@ -34,7 +32,6 @@ const PostDeleteEditButton: React.FC<PostDeleteEditButtonProps> = ({
   postId,
   postUserId,
 }) => {
-  const router = useRouter();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: meData } = useMeQuery();

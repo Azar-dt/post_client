@@ -1,14 +1,8 @@
+import { ApolloProvider } from "@apollo/client";
 import { ChakraProvider } from "@chakra-ui/react";
-
-import theme from "../theme";
 import { AppProps } from "next/app";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useApolloClient,
-} from "@apollo/client";
 import { useApollo } from "../libs/apolloClient";
+import theme from "../theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps);

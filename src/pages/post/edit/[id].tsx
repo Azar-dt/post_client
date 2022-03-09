@@ -8,21 +8,20 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
+import { Form, Formik } from "formik";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
+import { InputField } from "../../../components/InputField";
 import { Wrapper } from "../../../components/Wrapper";
 import {
   GetPostByIdDocument,
   PostInput,
   PostsDocument,
-  UpdatePostMutationVariables,
   useGetPostByIdQuery,
   useMeQuery,
   useUpdatePostMutation,
 } from "../../../generated/graphql";
-import NextLink from "next/link";
-import { Form, Formik } from "formik";
-import { InputField } from "../../../components/InputField";
 import { mapError } from "../../../helper/mapError";
 import { limit } from "../../index";
 interface EditPostProps {}
@@ -30,31 +29,26 @@ interface EditPostProps {}
 const EditPost: React.FC<EditPostProps> = ({}) => {
   const router = useRouter();
   const { id } = router.query;
-  const {
-    data: postData,
-    loading: postLoading,
-    error,
-  } = useGetPostByIdQuery({
+  const { data: postData, loading: postLoading } = useGetPostByIdQuery({
     variables: { getPostByIdId: Number(id) },
   });
   const { data: meData, loading: meLoading } = useMeQuery();
-  const [updatePost, { data: updateData, loading: updateLoading }] =
-    useUpdatePostMutation({
-      refetchQueries: [
-        {
-          query: GetPostByIdDocument,
-          variables: {
-            getPostByIdId: Number(id),
-          },
+  const [updatePost, { loading: updateLoading }] = useUpdatePostMutation({
+    refetchQueries: [
+      {
+        query: GetPostByIdDocument,
+        variables: {
+          getPostByIdId: Number(id),
         },
-        {
-          query: PostsDocument,
-          variables: {
-            limit,
-          },
+      },
+      {
+        query: PostsDocument,
+        variables: {
+          limit,
         },
-      ],
-    });
+      },
+    ],
+  });
   const toast = useToast();
   const onSubmitHandler = async (values: PostInput, { setErrors }) => {
     const { title, text } = values;

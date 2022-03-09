@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Link,
-  Spinner,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Link, Spinner, useToast } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import NextLink from "next/link";
 import Router from "next/router";
@@ -21,7 +13,7 @@ interface loginProps {}
 
 const login: React.FC<loginProps> = ({}) => {
   const toast = useToast();
-  const [login, { error, loading }] = useLoginMutation();
+  const [login, { loading }] = useLoginMutation();
   const { data: authData, loading: authLoading } = useCheckAuth();
 
   const onSubmitHandler = async (values, { setErrors }) => {

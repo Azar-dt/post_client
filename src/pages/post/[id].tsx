@@ -8,8 +8,11 @@ import {
   Heading,
   Spinner,
 } from "@chakra-ui/react";
+import { GetStaticPaths, GetStaticProps } from "next";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
+import PostDeleteEditButton from "../../components/PostDeleteEditButton";
 import { Wrapper } from "../../components/Wrapper";
 import {
   GetPostByIdDocument,
@@ -17,13 +20,8 @@ import {
   PaginatedPostsIdDocument,
   PaginatedPostsIdQuery,
   useGetPostByIdQuery,
-  useMeQuery,
-  usePaginatedPostsIdQuery,
 } from "../../generated/graphql";
-import NextLink from "next/link";
-import PostDeleteEditButton from "../../components/PostDeleteEditButton";
 import { addApolloState, initializeApollo } from "../../libs/apolloClient";
-import { GetStaticPaths, GetStaticProps } from "next";
 
 interface PostProps {}
 
