@@ -25,33 +25,25 @@ const VoteSection: React.FC<VoteSectionProps> = ({ post }) => {
   >("not-loading");
 
   const upvote = async (postId: string) => {
-    try {
-      setLoadingState("upvote-loading");
-      await vote({
-        variables: {
-          inputVoteValue: VoteType.UpVote,
-          postId: parseInt(postId),
-        },
-      });
-      setLoadingState("not-loading");
-    } catch (error) {
-      router.push("/login");
-    }
+    setLoadingState("upvote-loading");
+    await vote({
+      variables: {
+        inputVoteValue: VoteType.UpVote,
+        postId: parseInt(postId),
+      },
+    });
+    setLoadingState("not-loading");
   };
 
   const downvote = async (postId: string) => {
-    try {
-      setLoadingState("downvote-loading");
-      await vote({
-        variables: {
-          inputVoteValue: VoteType.DownVote,
-          postId: parseInt(postId),
-        },
-      });
-      setLoadingState("not-loading");
-    } catch (error) {
-      router.push("/login");
-    }
+    setLoadingState("downvote-loading");
+    await vote({
+      variables: {
+        inputVoteValue: VoteType.DownVote,
+        postId: parseInt(postId),
+      },
+    });
+    setLoadingState("not-loading");
   };
 
   return (
