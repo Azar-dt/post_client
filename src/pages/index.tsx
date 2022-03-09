@@ -91,21 +91,21 @@ const Index = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const apolloClient = initializeApollo({ headers: context.req.headers });
+// export const getServerSideProps: GetServerSideProps = async (
+//   context: GetServerSidePropsContext
+// ) => {
+//   const apolloClient = initializeApollo({ headers: context.req.headers });
 
-  await apolloClient.query({
-    query: PostsDocument,
-    variables: {
-      limit,
-    },
-  });
+//   await apolloClient.query({
+//     query: PostsDocument,
+//     variables: {
+//       limit,
+//     },
+//   });
 
-  return addApolloState(apolloClient, {
-    props: {},
-  });
-};
+//   return addApolloState(apolloClient, {
+//     props: {},
+//   });
+// };
 
 export default Index;

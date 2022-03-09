@@ -5,7 +5,11 @@ import Router from "next/router";
 import React from "react";
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
-import { MeDocument, useLoginMutation } from "../generated/graphql";
+import {
+  MeDocument,
+  PostsDocument,
+  useLoginMutation,
+} from "../generated/graphql";
 import { mapError } from "../helper/mapError";
 import { useCheckAuth } from "../utils/useCheckAuth";
 
@@ -31,6 +35,14 @@ const login: React.FC<loginProps> = ({}) => {
           });
         }
       },
+      refetchQueries: [
+        {
+          query: PostsDocument,
+          variables: {
+            limit: 3,
+          },
+        },
+      ],
     });
     if (response.data?.login.errors) {
       setErrors(mapError(response.data.login.errors));

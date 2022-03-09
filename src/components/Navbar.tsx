@@ -6,7 +6,6 @@ import {
   useLogoutMutation,
   useMeQuery,
 } from "../generated/graphql";
-import Router from "next/router";
 import { gql, Reference } from "@apollo/client";
 
 interface NavbarProps {}
