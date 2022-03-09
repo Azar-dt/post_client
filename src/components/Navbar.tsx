@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         }
       },
     });
-    Router.push("/");
+    // Router.push("/");
     return logoutLoading;
   };
   if (loading) {
