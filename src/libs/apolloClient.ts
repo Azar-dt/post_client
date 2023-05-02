@@ -50,7 +50,7 @@ function createApolloClient(headers: IncomingHttpHeaders | null = null) {
   const httpLink = new HttpLink({
     uri:
       process.env.NODE_ENV === "production"
-        ? "https://peaceful-lake-60901.herokuapp.com/graphql"
+        ? "http://54.65.18.235/graphql"
         : "http://localhost:4000/graphql", // Server URL (must be absolute)
     credentials: "include", // Additional fetch() options like `credentials` or `headers`
     fetch: enhancedFetch,
