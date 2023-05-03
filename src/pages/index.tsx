@@ -16,18 +16,21 @@ import VoteSection from "../components/VoteSection";
 import { Wrapper } from "../components/Wrapper";
 import { PostsDocument, usePostsQuery } from "../generated/graphql";
 import { addApolloState, initializeApollo } from "../libs/apolloClient";
+import { useEffect } from "react";
 
 export const limit = 3;
 
 const Index = () => {
-  const { data, loading, fetchMore, networkStatus } = usePostsQuery({
+  const { data, loading, fetchMore, networkStatus, refetch } = usePostsQuery({
     variables: {
       limit,
     },
     notifyOnNetworkStatusChange: false, // component render boi query nay se rerender khi networkstatus change
   });
+  useEffect(() => {
+    refetch();
+  }, []);
   const isLoadingMorePosts = networkStatus === NetworkStatus.fetchMore;
-
   const loadMorePosts = () =>
     fetchMore({ variables: { cursor: data?.posts?.cursor } });
   return (
@@ -46,7 +49,6 @@ const Index = () => {
           mt={"24px"}
         >
           {data?.posts?.paginatedPosts.map((post, idx) => {
-            // console.log(post);
             return (
               <Flex
                 key={idx}
