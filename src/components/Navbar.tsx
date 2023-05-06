@@ -85,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         maxW="800px"
       >
         <NextLink href={"/"}>
-          <Heading cursor={"pointer"}>Nextjs</Heading>
+          <Heading cursor={"pointer"}>Post</Heading>
         </NextLink>
         {boxLog}
       </Flex>
