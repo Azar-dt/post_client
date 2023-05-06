@@ -59,7 +59,9 @@ const Post: React.FC<PostProps> = ({}) => {
     <Wrapper>
       <Box w={800} mx={"auto"} mt={10}>
         <Heading mb={4}>{data?.getPostByID.title}</Heading>
-        <Box mb={4}>{data?.getPostByID.text}</Box>
+        <Box mb={4} whiteSpace={"break-spaces"}>
+          {data?.getPostByID.text}
+        </Box>
         <Flex justifyContent="space-between" alignItems="center">
           <NextLink href="/">
             <Button>Back to Homepage</Button>
