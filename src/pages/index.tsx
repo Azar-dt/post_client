@@ -68,7 +68,7 @@ const Index = () => {
                   </NextLink>
                   <Text>Post by {post.user.username} </Text>
                   <Flex alignItems={"center"}>
-                    <Text mt="4">{post.textSnippet}...</Text>
+                    <Text mt="4">{post.textSnippet.substring(0, 20)}...</Text>
                     <Box ml={"auto"}>
                       <PostDeleteEditButton
                         postId={post.id}
